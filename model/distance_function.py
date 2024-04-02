@@ -1,5 +1,6 @@
 """
     将距离函数keras层化，这样的好处是可以把该死的Lambda函数去掉
+    修正模型保存问题--2024.4.2
 """
 from keras.layers import Layer
 # import keras.backend as K
@@ -39,3 +40,12 @@ class MahalanobisDistanceLayer(Layer):
     def compute_output_shape(self, input_shape):
         shape1, _ = input_shape
         return (shape1[0], 1)
+
+    def get_config(self):
+        config = super().get_config()
+        config.update(
+            {
+                'inverse_covariance': K.eval(self.inverse_covariance).tolist()
+            }
+        )
+        return config
